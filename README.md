@@ -103,7 +103,7 @@ while True:
     time.sleep(10)
 ````
 
-### OUPUT  
+### OUTPUT  
 # FIGURE -04 CIRCUIT 
 <img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/a6e7e277-59a0-49d5-b51d-034f0f607fee" />
 
@@ -220,7 +220,7 @@ finally:
     print("MQTT Disconnected")
 ````
 
-### OUPUT  
+### OUTPUT  
 # FIGURE -07 CIRCUIT
 <img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/ec403f50-6541-48b8-a14b-f7bcdf9f842c" />
 

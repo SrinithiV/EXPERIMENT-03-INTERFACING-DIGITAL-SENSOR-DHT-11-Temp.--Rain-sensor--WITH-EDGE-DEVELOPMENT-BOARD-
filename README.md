@@ -1,18 +1,10 @@
- # EXPERIMENT-03-INTERFACING-DIGITAL-SENSOR-DHT-11-Temperature-Sensor-and-Rain-Sensor-WITH-EDGE-DEVELOPMENT-BOARD-
-
----
-
-### **NAME:**  
-### **DEPARTMENT:**  
-### **ROLL NO:**  
-### **DATE OF EXPERIMENT:**  
-
----
+# EXPERIMENT-03-INTERFACING-DIGITAL-SENSOR-DHT-11-Temperature-Sensor-and-Rain-Sensor-WITH-EDGE-DEVELOPMENT-BOARD
+### **NAME:** SRINITHI V
+### **DEPARTMENT:**  CSE(IoT)
+### **ROLL NO:**  212223110051
 
 ## **AIM:**  
 To interface an **Temperature and humidity sensor (DHT 11) Rain Sensor (LM393)** with the **Raspberry Pi 4** and display the sensor readings using HiveMQ cloud.
-
----
 
 ## **APPARATUS REQUIRED:**  
 1. Raspberry Pi 4  
@@ -22,19 +14,16 @@ To interface an **Temperature and humidity sensor (DHT 11) Rain Sensor (LM393)**
 5. USB Cable  
 6. Computer with Thonny IDE  
 
----
-
 ## **THEORY:**  
 <img width="1293" height="744" alt="image" src="https://github.com/user-attachments/assets/3c04afa6-1517-45d2-88f1-e671d9ed1ffb" />
-
  ### FIGURE-01 RASPI PI 4 PINOUT DIAGRAM: 
 
 The Raspberry Pi 4 Model B is built around a Broadcom BCM2711 system-on-chip that integrates a quad-core ARM Cortex-A72 (64-bit) CPU, VideoCore VI GPU, memory controller, and peripheral interfaces, forming a compact yet complete computer architecture where the SoC connects internally to RAM, USB 3.0 controller, Gigabit Ethernet, HDMI display, and wireless modules. Its 40-pin GPIO header provides a flexible pin configuration consisting of power pins (5 V and 3.3 V), multiple ground pins, and general-purpose input/output pins that operate at 3.3 V logic and can be programmed for digital I/O or alternate functions. Key alternate functions include I²C (SDA, SCL) for sensor communication, SPI (MOSI, MISO, SCLK, CS) for high-speed peripheral interfacing, UART (TX, RX) for serial communication, and PWM for control applications.  For communication, I2C (SDA, SCL), SPI (MOSI, MISO, SCK), and UART (TX, RX) interfaces are mapped across different GPIO pins, allowing seamless connectivity with sensors and peripherals. All GPIO pins support PWM (Pulse Width Modulation), making it useful for motor control, LED brightness adjustment, and sound applications. The BOOTSEL button enables USB mass storage mode for firmware flashing, while the DEBUG pins (SWD interface) provide debugging capabilities. With its low power consumption, flexible GPIO options, and rich interface support, the Raspberry Pi Pico is widely used for IoT, embedded systems, robotics, and automation projects.This architecture and pin multiplexing allow the Raspberry Pi 4 to act as both a general-purpose computing platform and an embedded controller, supporting rapid prototyping, hardware interfacing, and IoT applications.
+
 ## Temperature and Humidity Sensor (DHT-11):
 The DHT11 is a low-cost digital sensor used to measure ambient temperature and relative humidity in embedded and IoT applications. It integrates a thermistor for temperature sensing and a capacitive humidity sensor for detecting moisture levels in the air, along with an internal 8-bit microcontroller that processes the signals and provides calibrated digital output through a single-wire communication interface. The sensor operates typically at 3.3 V to 5 V, measures temperature in the range of 0 °C to 50 °C with ±2 °C accuracy, and humidity from 20% to 80% with ±5% accuracy. Due to its simple interface, low power consumption, and reliable performance, it is widely used in weather monitoring systems, home automation, agricultural monitoring, and basic environmental data acquisition projects.
 
 <img width="1000" height="1000" alt="image" src="https://github.com/user-attachments/assets/5c8d35b5-4381-434f-8617-db4b8fe19154" />
-
 ### FIGURE-02 Temperature and Humidity Sensor (DHT-11)
 
 ## Rain Sensor (LM393):
@@ -44,8 +33,6 @@ A rain sensor is one kind of switching device which is used to detect the rainfa
 <img width="443" height="266" alt="image" src="https://github.com/user-attachments/assets/c9750628-c41f-4181-8dcd-e07873d227d9" />
 
 <img width="393" height="120" alt="image" src="https://github.com/user-attachments/assets/997aa631-9647-42cc-94d6-754742f7bf18" />
-
-
  ### FIGURE-03 Rain Sensor (LM393) Rain Sensor Module & connection diagram
 
 ## Working Principle:
@@ -57,7 +44,6 @@ Connect the Vcc of the Temperature and Humidity Sensor (DHT-11) is connected to 
 Connect the Gnd of the Temperature and Humidity Sensor (DHT-11) is connected to Gnd in Raspberrry Pi4.
 Connect the OUT to any one GPIO.
 
-
 Experiment 3B
 The Rain Sensor (LM393) D0 is connected one of the GPIO pins in Raspberry Pi 4.
 The Python script sets the Rain Sensor (LM393) value based on the variation in the rain water (Dry or Wet) and shown in HiveMQ Cloud and console.
@@ -66,53 +52,183 @@ Connect the Rain Sensor (LM393) Vcc to any +5V.
 Connect the Rain Sensor (LM393) GND to any GND.
 Connect the Rain Sensor (LM393) D0 to any one GPIO. 
 
-
 Experiment 3A
 ## PROGRAM (Python)
 ```
+import Adafruit_DHT
+import paho.mqtt.client as mqtt
+import ssl
+import time
+# ---------------- DHT11 Setup ----------------
+DHT_SENSOR = Adafruit_DHT.DHT11
+DHT_PIN = 18  # GPIO18
+# ---------------- HiveMQ Cloud Credentials ----------------
+MQTT_BROKER = "99abf9ad843d4d2c9de4899b56eb863a.s1.eu.hivemq.cloud"
+MQTT_PORT = 8883
+MQTT_USER = "hivemq.webclient.1785579047827"
+MQTT_PASSWORD = "u;2%rC70tVIM,n<1hfWT"
 
+TEMP_TOPIC = "raspberrypi/dht/temperature"
+HUM_TOPIC = "raspberrypi/dht/humidity"
+# ---------------- MQTT Client Setup ----------------
+client = mqtt.Client()
+client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
 
- 
+client.tls_set(tls_version=ssl.PROTOCOL_TLS)
 
+client.connect(MQTT_BROKER, MQTT_PORT)
 
+print("Connected to HiveMQ Cloud")
+print("Reading DHT11 Sensor...\n")
+# ---------------- Main Loop ----------------
+while True:
 
- 
+    humidity, temperature = Adafruit_DHT.read(DHT_SENSOR, DHT_PIN)
+
+    if humidity is not None and temperature is not None:
+
+        print(f"Temperature = {temperature} °C")
+        print(f"Humidity = {humidity} %")
+        print("---------------------------")
+
+        # Publish to HiveMQ
+        client.publish(TEMP_TOPIC, temperature)
+        client.publish(HUM_TOPIC, humidity)
+
+        print("Data sent to HiveMQ\n")
+
+    else:
+        print("Sensor failure. Check wiring.")
+
+    time.sleep(10)
 ````
 
 ### OUPUT  
+# FIGURE -04 CIRCUIT 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/a6e7e277-59a0-49d5-b51d-034f0f607fee" />
 
+#  FIGURE -05 CONSOLE
+<img width="1919" height="1079" alt="Screenshot 2026-08-17 162053" src="https://github.com/user-attachments/assets/65e1a2b2-da9e-4ecf-8883-cfe4f4ba092f" />
 
-# FIGURE -04 ADD TITILE HERE 
-
-#  FIGURE -05 ADD TITILE HERE 
-
-# FIGURE -06 ADD TITLE HERE 
+# FIGURE -06 CLOUD
+<img width="1904" height="976" alt="Screenshot 2026-08-17 162114" src="https://github.com/user-attachments/assets/88bbe6fd-1746-40af-b545-5217ed138104" />
 
 Experiment 3B
 ## PROGRAM (Python)
 ```
+import time
+import ssl
+import json
+import RPi.GPIO as GPIO
+import paho.mqtt.client as mqtt
+# =====================================================
+# GPIO SETUP
+# =====================================================
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
+RAIN_SENSOR_PIN = 18
 
- 
+GPIO.setup(RAIN_SENSOR_PIN, GPIO.IN)
+# =====================================================
+# MQTT SETUP
+# =====================================================
 
+MQTT_BROKER = "99abf9ad843d4d2c9de4899b56eb863a.s1.eu.hivemq.cloud"
+MQTT_PORT = 8883
 
+MQTT_USER = "hivemq.webclient. 1785581075112"
+MQTT_PASSWORD = ".WszV%830apZI@X?ye4G"
 
- 
+MQTT_TOPIC = "raspberrypi/rain"
+
+client = mqtt.Client()
+
+client.username_pw_set(
+    MQTT_USER,
+    MQTT_PASSWORD
+)
+
+client.tls_set(
+    tls_version=ssl.PROTOCOL_TLS
+)
+# =====================================================
+# CONNECT TO HIVEMQ
+# =====================================================
+
+print("Connecting to HiveMQ Cloud...")
+
+client.connect(
+    MQTT_BROKER,
+    MQTT_PORT
+)
+
+client.loop_start()
+
+print("Connected Successfully")
+
+# =====================================================
+# MAIN LOOP
+# =====================================================
+
+try:
+
+    while True:
+
+        rain_value = GPIO.input(RAIN_SENSOR_PIN)
+
+        # ACTIVE LOW SENSOR
+        if rain_value == 0:
+
+            status = "RAIN DETECTED"
+            rain_status = 1
+
+        else:
+
+            status = "NO RAIN"
+            rain_status = 0
+
+        print(status)
+
+        payload = {
+            "rain_status": rain_status,
+            "message": status
+        }
+
+        client.publish(
+            MQTT_TOPIC,
+            json.dumps(payload)
+        )
+
+        print("Data Published")
+        print(payload)
+
+        time.sleep(5)
+
+except KeyboardInterrupt:
+
+    print("Program Stopped")
+
+finally:
+
+    GPIO.cleanup()
+
+    client.loop_stop()
+    client.disconnect()
+
+    print("GPIO Cleaned")
+    print("MQTT Disconnected")
 ````
 
 ### OUPUT  
+# FIGURE -07 CIRCUIT
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/ec403f50-6541-48b8-a14b-f7bcdf9f842c" />
 
-# FIGURE -07 ADD TITILE HERE 
+#  FIGURE -08 CONSOLE 
+<img width="1919" height="1079" alt="Screenshot 2026-08-22 111346" src="https://github.com/user-attachments/assets/cbb4901f-9c54-4d61-9827-f69da6ce9899" />
 
-#  FIGURE -08 ADD TITILE HERE 
-
-# FIGURE -09 ADD TITLE HERE 
-
-
-
+# FIGURE -09 CLOUD
+<img width="1917" height="980" alt="Screenshot 2026-08-22 111339" src="https://github.com/user-attachments/assets/05395c82-fa9e-448d-8c58-4172b7833072" />
 
 ## **RESULT:**  
 The **Temperature and humidity sensor (DHT 11) Rain Sensor (LM393)** was successfully interfaced with the **Raspberry Pi 4**, and real-time **Temperature, Humidity and Rain status** were read and displayed in Console and HiveMq Cloud. 
-
----
-

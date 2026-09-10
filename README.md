@@ -1,7 +1,7 @@
 # EXPERIMENT-03-INTERFACING-DIGITAL-SENSOR-DHT-11-Temperature-Sensor-and-Rain-Sensor-WITH-EDGE-DEVELOPMENT-BOARD
 ### **NAME:** SRINITHI V
 ### **DEPARTMENT:**  CSE(IoT)
-### **ROLL NO:**  212223110051
+### **ROLL NO:**  212223115003
 
 ## **AIM:**  
 To interface an **Temperature and humidity sensor (DHT 11) Rain Sensor (LM393)** with the **Raspberry Pi 4** and display the sensor readings using HiveMQ cloud.
